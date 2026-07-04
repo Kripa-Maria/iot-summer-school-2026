@@ -1,15 +1,14 @@
-# Compiled Arduino files
+# Block and skip compiled microchip processing binary outputs
 *.hex
 *.elf
+*.o
 
-# Build folders
-build/
-
-# VS Code settings
+# Exclude IDE runtime properties and workspace clutter configurations
 .vscode/
+build/
+bin/
+out/
 
-# macOS files
+# Suppress localized operating system specific metadata tracks
 .DS_Store
-
-# Windows files
 Thumbs.db
