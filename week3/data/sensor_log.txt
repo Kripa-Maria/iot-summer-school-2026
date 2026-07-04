@@ -1,0 +1,6 @@
+=== SENSOR LOG ===
+Time      : 5000 ms
+Temp      : 28.5 C | Humidity: 65%
+Light     : 73% (Bright)
+Distance  : 42 cm
+==================
