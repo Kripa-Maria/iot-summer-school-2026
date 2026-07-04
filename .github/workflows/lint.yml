@@ -1,0 +1,22 @@
+name: Automatic Sketch Repository Counter Workflow
+on: [push]
+
+jobs:
+  tally-arduino-sketches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Current Workspace Tree Nodes
+        uses: actions/checkout@v4
+
+      - name: Configure Clean Python Runner Instance
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Execute Workspace Counter Scan
+        run: |
+          python3 -c "
+          import glob
+          discovered_sketches = glob.glob('**/*.ino', recursive=True)
+          print(f'Verification Report: Discovered exactly {len(discovered_sketches)} active Arduino .ino sketch components across repository paths.')
+          "
