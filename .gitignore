@@ -1,14 +1,14 @@
-# Block and skip compiled microchip processing binary outputs
+# Exclude Compiled Output Files
 *.hex
 *.elf
 *.o
 
-# Exclude IDE runtime properties and workspace clutter configurations
+# Exclude OS-Specific Files
+.DS_Store
+Thumbs.db
+
+# Exclude IDE Config Folders and Build Outputs
 .vscode/
 build/
 bin/
 out/
-
-# Suppress localized operating system specific metadata tracks
-.DS_Store
-Thumbs.db
