@@ -18,11 +18,12 @@ void setup() {
   pinMode(RED_LED, OUTPUT);
   pinMode(GRN_LED, OUTPUT);
   
+  // Print CSV Header
   Serial.println("timestamp_ms,temp_C,temp_F,humidity_pct");
 }
 
 void loop() {
-  delay(2000);
+  delay(2000); // 2-second measurement interval requirement
 
   float c = dht.readTemperature();
   float f = dht.readTemperature(true);
@@ -30,6 +31,7 @@ void loop() {
 
   if (isnan(h) || isnan(c) || isnan(f)) return;
 
+  // Thermal/Humidity threshold check
   if (c > 35.0 || h > 80.0) {
     digitalWrite(RED_LED, HIGH);
     digitalWrite(GRN_LED, LOW);
@@ -38,6 +40,7 @@ void loop() {
     digitalWrite(GRN_LED, HIGH);
   }
 
+  // Stream formatted CSV data array
   Serial.print(millis()); Serial.print(",");
   Serial.print(c, 1);     Serial.print(",");
   Serial.print(f, 1);     Serial.print(",");
