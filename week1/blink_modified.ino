@@ -3,13 +3,11 @@ void setup() {
 }
 
 void loop() {
-  // Blink rapidly 3 times
   for(int i = 0; i < 3; i++) {
     digitalWrite(13, HIGH);
     delay(200);
     digitalWrite(13, LOW);
     delay(200);
   }
-  // Pause cycle for exactly 2 seconds
   delay(2000);
 }
