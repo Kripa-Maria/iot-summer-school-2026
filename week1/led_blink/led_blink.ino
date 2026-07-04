@@ -15,6 +15,7 @@ void setup() {
 }
 
 void loop() {
+  // Read potentiometer to control blink speed (0-1023 ms dynamic delay)
   int dynamicDelayRate = analogRead(controlWiperPin); 
 
   digitalWrite(13, HIGH);
@@ -22,6 +23,7 @@ void loop() {
   digitalWrite(13, LOW);
   delay(dynamicDelayRate);
   
+  // Increment and log data to Serial Monitor
   loopAccumulator++;
   Serial.print("Blink count: ");
   Serial.println(loopAccumulator);

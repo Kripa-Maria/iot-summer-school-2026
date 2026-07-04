@@ -1,4 +1,4 @@
-# IoT & Embedded Systems Program — Summer School 2026
+# IoT & Embedded Systems Program Summer School 2026
 **Student Name:** Kripa Maria  
 **Institution:** IIT Jammu  
 
