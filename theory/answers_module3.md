@@ -9,4 +9,4 @@ Sensor calibration is the practice of tuning runtime outputs against physical co
 3. Transfer Formula: `Moisture_Pct = map(analogRead(A0), 1023, 220, 0, 100);`
 
 ## Q30. The I2C Communication Protocol Schema
-The Inter-Integrated Circuit (I2C) standard uses two lines—SDA (Serial Data) and SCL (Serial Clock)—for synchronous, short-distance communications. Peripherals are called selectively by masters broadcasting target 7-bit hardware addresses over the lines.
+The Inter-Integrated Circuit (I2C) standard uses two linesDA (Serial Data) and SCL (Serial Clock)or synchronous, short-distance communications. Peripherals are called selectively by masters broadcasting target 7-bit hardware addresses over the lines.
