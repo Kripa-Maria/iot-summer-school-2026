@@ -6,7 +6,7 @@
  * Version: v1.0
  *****************************************************************************/
 
-// Pin definitions matching your Tinkercad configuration
+
 const int red = 2, yellow = 3, green = 4, btn = 7;
 unsigned long stateStart = 0;
 int state = 0; // 0=RED,1=YELLOW,2=GREEN
