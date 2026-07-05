@@ -1,39 +1,55 @@
-const int LED_PWM_PIN = 9;  
-const int BUTTON_PIN = 2;   
-
-int currentMode = 0;        
-bool lastButtonState = HIGH;
+const int ledPin = 9, btn = 7;
+int mode = 0; // 0=slow breathing, 1=fast pulse, 2=SOS
+int lastBtnState = HIGH;
 
 void setup() {
-  pinMode(LED_PWM_PIN, OUTPUT);
-  pinMode(BUTTON_PIN, INPUT_PULLUP); 
+  pinMode(ledPin, OUTPUT);
+  pinMode(btn, INPUT_PULLUP);
   Serial.begin(9600);
+  Serial.println("Mode: Slow Breathing");
+}
+
+void breathe(int cycleMs) {
+  int steps = 100;
+  for (int i = 0; i < steps; i++) {
+    if (checkModeChange()) return;
+    analogWrite(ledPin, map(i, 0, steps, 0, 255));
+    delay(cycleMs / (2 * steps));
+  }
+  for (int i = steps; i >= 0; i--) {
+    if (checkModeChange()) return;
+    analogWrite(ledPin, map(i, 0, steps, 0, 255));
+    delay(cycleMs / (2 * steps));
+  }
+}
+
+void sos() {
+  int dot = 200, dash = 600, gap = 200;
+  int pattern[] = {dot, dot, dot, dash, dash, dash, dot, dot, dot};
+  for (int i = 0; i < 9; i++) {
+    if (checkModeChange()) return;
+    analogWrite(ledPin, 255); delay(pattern[i]);
+    analogWrite(ledPin, 0); delay(gap);
+  }
+  delay(1000);
+}
+
+bool checkModeChange() {
+  int state = digitalRead(btn);
+  if (state == LOW && lastBtnState == HIGH) {
+    mode = (mode + 1) % 3;
+    Serial.println(mode == 0 ? "Mode: Slow Breathing" : mode == 1 ? "Mode: Fast Pulse" : "Mode: SOS");
+    lastBtnState = state;
+    delay(200);
+    return true;
+  }
+  lastBtnState = state;
+  return false;
 }
 
 void loop() {
-  bool currentButtonState = digitalRead(BUTTON_PIN);
-  if (lastButtonState == HIGH && currentButtonState == LOW) {
-    delay(50); 
-    currentMode = (currentMode + 1) % 4;
-    switch (currentMode) {
-      case 0:
-        analogWrite(LED_PWM_PIN, 0);   
-        Serial.println("OFF (PWM: 0)");
-        break;
-      case 1:
-        analogWrite(LED_PWM_PIN, 64);  
-        Serial.println("Low (PWM: 64)");
-        break;
-      case 2:
-        analogWrite(LED_PWM_PIN, 127); 
-        Serial.println("Medium (PWM: 127)");
-        break;
-      case 3:
-        analogWrite(LED_PWM_PIN, 255); 
-        Serial.println("High (PWM: 255)");
-        break;
-    }
-    while(digitalRead(BUTTON_PIN) == LOW);
-  }
-  lastButtonState = currentButtonState;
+  checkModeChange();
+  if (mode == 0) breathe(3000);
+  else if (mode == 1) breathe(500);
+  else sos();
 }
