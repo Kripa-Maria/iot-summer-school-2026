@@ -1,22 +1,38 @@
-name: Automatic Sketch Repository Counter Workflow
-on: [push]
+name: File Count Automation CI
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
-  tally-arduino-sketches:
+  count-sketches:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Fetch Current Workspace Tree Nodes
-        uses: actions/checkout@v4
+    - name: Checkout Repository Workspace Assets
+      uses: actions/checkout@v4
 
-      - name: Configure Clean Python Runner Instance
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
+    - name: Initialize Python Runtime Environment
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
 
-      - name: Execute Workspace Counter Scan
-        run: |
-          python3 -c "
-          import glob
-          discovered_sketches = glob.glob('**/*.ino', recursive=True)
-          print(f'Verification Report: Discovered exactly {len(discovered_sketches)} active Arduino .ino sketch components across repository paths.')
-          "
+    - name: Run File Scanner Script
+      run: |
+        python -c "
+        import os
+        from pathlib import Path
+        
+        # Scan the workspace recursively for Arduino sketch files
+        ino_files = list(Path('.').rglob('*.ino'))
+        count = len(ino_files)
+        
+        print('='*50)
+        print(f'📊 CI/CD AUTOMATION REPORT: FOUND {count} ARDUINO SKETCHES')
+        print('='*50)
+        for index, file_path in enumerate(ino_files, start=1):
+            print(f' [{index}] -> {file_path}')
+        print('='*50)
+        "
