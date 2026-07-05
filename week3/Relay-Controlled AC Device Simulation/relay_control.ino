@@ -1,14 +1,36 @@
-#include <DHT.h>
-#define DHTPIN 4
-#define DHTTYPE DHT11
-DHT dht(DHTPIN, DHTTYPE);
-const int RELAY_PIN = 8; const int OVERRIDE = 7;
-bool relayOn = false; bool manual = false;
-void setup() { dht.begin(); pinMode(RELAY_PIN, OUTPUT); pinMode(OVERRIDE, INPUT_PULLUP); }
+const int potPin = A0, relayPin = 8, btn = 7;
+bool relayOn = false, manualOverride = false;
+int lastBtnState = HIGH;
+
+float readSimulatedTemp() {
+  int raw = analogRead(potPin);           // 0–1023
+  return map(raw, 0, 1023, 0, 500) / 10.0; // maps to 0.0–50.0 °C
+}
+
+void setup() {
+  pinMode(relayPin, OUTPUT);
+  pinMode(btn, INPUT_PULLUP);
+  Serial.begin(9600);
+}
+
 void loop() {
-  float temp = dht.readTemperature();
-  if (digitalRead(OVERRIDE) == LOW) { manual = !manual; delay(300); }
-  if (manual) { relayOn = true; }
-  else { if (temp > 32.0) relayOn = true; else if (temp < 28.0) relayOn = false; }
-  digitalWrite(RELAY_PIN, relayOn ? HIGH : LOW); delay(2000);
+  int btnState = digitalRead(btn);
+  if (btnState == LOW && lastBtnState == HIGH) {
+    manualOverride = !manualOverride;
+    Serial.println(manualOverride ? "Manual override ON" : "Manual override OFF, resuming auto");
+    delay(200);
+  }
+  lastBtnState = btnState;
+
+  float temp = readSimulatedTemp();
+
+  if (!manualOverride) {
+    if (!relayOn && temp > 32) { relayOn = true; }
+    else if (relayOn && temp < 28) { relayOn = false; }
+  }
+
+  digitalWrite(relayPin, relayOn ? HIGH : LOW);
+  Serial.print("Temp (pot): "); Serial.print(temp);
+  Serial.print(" C | Relay: "); Serial.println(relayOn ? "ON" : "OFF");
+  delay(500);
 }
