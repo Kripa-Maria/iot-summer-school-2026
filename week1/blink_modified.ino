@@ -1,3 +1,7 @@
+/*
+ * Modified 
+ * Added descriptive comments for readability.
+ */
 void setup() {
   pinMode(13, OUTPUT);
 }
