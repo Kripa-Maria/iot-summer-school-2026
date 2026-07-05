@@ -56,3 +56,13 @@ The connections are wired securely onto the prototyping board using a shared com
 * **1. The LED Remains Off But Simulation Runs:** Check the orientation of your LED. Current can only flow from the positive Anode (bent leg) to the negative Cathode (straight leg). If it is reversed, the circuit will stay dark.
 * **2. Turning the Potentiometer Has No Effect on Speed:** Double-check that the middle wiper pin of your potentiometer is firmly connected to **A0** instead of power or ground, and verify your `map()` function bounds in the source code.
 * **3. Serial Monitor Displays Garbled Characters or Question Marks:** Ensure that the baud rate selection dropdown in the bottom right corner of your Serial Monitor window matches exactly **9600 baud**, corresponding to the `Serial.begin(9600)` declaration.
+
+---
+
+## 🖼️ Tinkercad Circuit Diagrams
+
+### Baseline LED Blink Circuit (Q2)
+![Q2 Baseline LED Circuit](../schematics/led_blink_basic.jpg)
+
+### Potentiometer LED Speed Control Circuit (Q4)
+![Q4 Potentiometer LED Control Circuit](../schematics/potentiometer_led_control.jpg)
