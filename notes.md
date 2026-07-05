@@ -1,5 +1,7 @@
-# Repository Branching Strategies
-- **main**: Fully validated codebases ready for final submission evaluation.
-- **dev**: General integration zone for compiling and staging active developments.
-- **sensor-module**: Target deployment branch for Module 3 data acquisition experiments.
-- **wireless-module**: Workspace for Module 4 Wi-Fi, BLE, and MQTT network protocols.
+# Repository Branching Strategy Documentation
+
+## Branch Architecture Mapping:
+- **main**: Production-ready branch containing fully validated, stable, and graded code modules.
+- **dev**: Active integration stream used for compiling ongoing tasks and general theory submissions before release.
+- **sensor-module**: Isolated feature stream dedicated exclusively to prototyping Module 3 sensor configurations (DHT11, HC-SR04, LDR).
+- **wireless-module**: Isolated feature stream dedicated exclusively to prototyping Module 4 communication protocols (BLE, Wi-Fi, MQTT).
