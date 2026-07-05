@@ -1,48 +1,47 @@
-/******************************************************************************
- * Author: Kripa Maria [cite: 55, 248]
- * Date: July 2026 [cite: 55, 248]
- * Description: 4-key scale piano running scale chords and scale modulations[cite: 105, 108, 109].
- *****************************************************************************/
-const int BTN_DO = 2; const int BTN_RE = 3; const int BTN_MI = 4; const int BTN_FA = 5;
-const int BTN_TOGGLE = 6; const int BUZZER_PIN = 9;
+const int KEY_PINS[] = {2, 3, 4, 5};
+const int TOGGLE_PIN = 6;
+const int BUZZER_PIN = 8;
 
-bool minorScaleMode = false;
+const int MAJOR_FREQS[] = {262, 294, 330, 349}; 
+const int MINOR_FREQS[] = {262, 294, 311, 349}; 
+const int NOTE_SOL = 392;
+
+bool isMinorMode = false;
+bool lastToggleState = HIGH;
 
 void setup() {
-  pinMode(BTN_DO, INPUT_PULLUP); pinMode(BTN_RE, INPUT_PULLUP);
-  pinMode(BTN_MI, INPUT_PULLUP); pinMode(BTN_FA, INPUT_PULLUP);
-  pinMode(BTN_TOGGLE, INPUT_PULLUP); pinMode(BUZZER_PIN, OUTPUT);
+  for (int i = 0; i < 4; i++) {
+    pinMode(KEY_PINS[i], INPUT_PULLUP);
+  }
+  pinMode(TOGGLE_PIN, INPUT_PULLUP);
+  pinMode(BUZZER_PIN, OUTPUT);
 }
 
 void loop() {
-  if (digitalRead(BTN_TOGGLE) == LOW) {
-    minorScaleMode = !minorScaleMode; // Mode shift [cite: 109]
-    delay(300);
+  bool currentToggleState = digitalRead(TOGGLE_PIN);
+  if (lastToggleState == HIGH && currentButtonState == LOW) {
+    delay(50);
+    isMinorMode = !isMinorMode;
+    while(digitalRead(TOGGLE_PIN) == LOW);
   }
+  lastToggleState = currentToggleState;
 
-  int activeKeys = 0;
-  if (digitalRead(BTN_DO) == LOW) activeKeys++;
-  if (digitalRead(BTN_RE) == LOW) activeKeys++;
-  if (digitalRead(BTN_MI) == LOW) activeKeys++;
-  if (digitalRead(BTN_FA) == LOW) activeKeys++;
-
-  // Chord rule processing check [cite: 108]
-  if (activeKeys >= 2) {
-    tone(BUZZER_PIN, 392); // Play Sol chord substitute note [cite: 108]
-  } 
-  else if (digitalRead(BTN_DO) == LOW) {
-    tone(BUZZER_PIN, minorScaleMode ? 247 : 262); // Do pitch selection [cite: 106]
-  } 
-  else if (digitalRead(BTN_RE) == LOW) {
-    tone(BUZZER_PIN, minorScaleMode ? 277 : 294); // Re pitch selection [cite: 106]
-  } 
-  else if (digitalRead(BTN_MI) == LOW) {
-    tone(BUZZER_PIN, minorScaleMode ? 311 : 330); // Mi pitch selection [cite: 106]
-  } 
-  else if (digitalRead(BTN_FA) == LOW) {
-    tone(BUZZER_PIN, minorScaleMode ? 329 : 349); // Fa pitch selection [cite: 106]
-  } 
-  else {
-    noTone(BUZZER_PIN); // Mute on silence bounds [cite: 107]
+  int pressCount = 0;
+  int lastPressedIndex = -1;
+  
+  for (int i = 0; i < 4; i++) {
+    if (digitalRead(KEY_PINS[i]) == LOW) {
+      pressCount++;
+      lastPressedIndex = i;
+    }
+  }
+  
+  if (pressCount > 1) {
+    tone(BUZZER_PIN, NOTE_SOL);
+  } else if (pressCount == 1) {
+    int activeFreq = isMinorMode ? MINOR_FREQS[lastPressedIndex] : MAJOR_FREQS[lastPressedIndex];
+    tone(BUZZER_PIN, activeFreq);
+  } else {
+    noTone(BUZZER_PIN);
   }
 }
