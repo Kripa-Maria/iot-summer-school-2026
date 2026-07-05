@@ -1,52 +1,45 @@
-enum MachineState { STATE_IDLE, STATE_COIN_INSERTED, STATE_DISPENSING };
-MachineState currentState = STATE_IDLE;
+const int btnCoin=2, btnSelect=3, btnCancel=4;
+const int ledIdle=8, ledBusy=9, ledDispense=10;
+enum State {IDLE, COIN_INSERTED, ITEM_SELECTED, DISPENSING};
+State state = IDLE;
+unsigned long stateTime = 0;
+void changeState(State s);
+void setLEDs() {
+  digitalWrite(ledIdle, state == IDLE);
+  digitalWrite(ledBusy, state == COIN_INSERTED || state == ITEM_SELECTED);
+  digitalWrite(ledDispense, state == DISPENSING);
+}
 
-const int PIN_COIN = 2;
-const int PIN_SELECT = 3;
-const int PIN_CANCEL = 4;
-const int PIN_ACTUATOR = 13;
+void changeState(State s) {
+  state = s;
+  stateTime = millis();
+  setLEDs();
+  const char* names[] = {"IDLE", "COIN_INSERTED", "ITEM_SELECTED", "DISPENSING"};
+  Serial.print("Transition -> "); Serial.println(names[s]);
+}
 
 void setup() {
-  pinMode(PIN_COIN, INPUT_PULLUP);
-  pinMode(PIN_SELECT, INPUT_PULLUP);
-  pinMode(PIN_CANCEL, INPUT_PULLUP);
-  pinMode(PIN_ACTUATOR, OUTPUT);
-  digitalWrite(PIN_ACTUATOR, LOW);
+  pinMode(btnCoin, INPUT_PULLUP); pinMode(btnSelect, INPUT_PULLUP); pinMode(btnCancel, INPUT_PULLUP);
+  pinMode(ledIdle, OUTPUT); pinMode(ledBusy, OUTPUT); pinMode(ledDispense, OUTPUT);
   Serial.begin(9600);
+  changeState(IDLE);
 }
 
 void loop() {
-  switch (currentState) {
-    case STATE_IDLE:
-      if (digitalRead(PIN_COIN) == LOW) {
-        delay(50);
-        currentState = STATE_COIN_INSERTED;
-        Serial.println("Coin Detected!");
-        while(digitalRead(PIN_COIN) == LOW);
-      }
-      break;
+  if (digitalRead(btnCancel) == LOW) { changeState(IDLE); delay(200); return; }
 
-    case STATE_COIN_INSERTED:
-      if (digitalRead(PIN_SELECT) == LOW) {
-        delay(50);
-        currentState = STATE_DISPENSING;
-        Serial.println("Item Selected!");
-        while(digitalRead(PIN_SELECT) == LOW);
-      } 
-      else if (digitalRead(PIN_CANCEL) == LOW) {
-        delay(50);
-        currentState = STATE_IDLE;
-        Serial.println("Cancelled. Refunding coin.");
-        while(digitalRead(PIN_CANCEL) == LOW);
-      }
+  switch (state) {
+    case IDLE:
+      if (digitalRead(btnCoin) == LOW) { changeState(COIN_INSERTED); delay(200); }
       break;
-
-    case STATE_DISPENSING:
-      digitalWrite(PIN_ACTUATOR, HIGH);
-      delay(2000);
-      digitalWrite(PIN_ACTUATOR, LOW);
-      currentState = STATE_IDLE;
-      Serial.println("Dispense Complete. Status: IDLE.");
+    case COIN_INSERTED:
+      if (digitalRead(btnSelect) == LOW) { changeState(ITEM_SELECTED); delay(200); }
+      break;
+    case ITEM_SELECTED:
+      if (millis() - stateTime > 1000) changeState(DISPENSING);
+      break;
+    case DISPENSING:
+      if (millis() - stateTime > 2000) changeState(IDLE);
       break;
   }
 }
