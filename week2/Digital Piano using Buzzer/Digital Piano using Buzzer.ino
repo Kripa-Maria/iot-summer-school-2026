@@ -1,44 +1,41 @@
-const int KEY_PINS[] = {2, 3, 4, 5};
-const int TOGGLE_PIN = 6;
-const int BUZZER_PIN = 8;
-const int MAJOR_FREQS[] = {262, 294, 330, 349}; 
-const int MINOR_FREQS[] = {262, 294, 311, 349}; 
-const int NOTE_SOL = 392;
-
-bool isMinorMode = false;
-bool lastToggleState = HIGH;
+const int btnDo=2, btnRe=3, btnMi=4, btnFa=5, btnMode=6, buzzer=8;
+bool minorMode = false;
+int lastModeState = HIGH;
 
 void setup() {
-  for (int i = 0; i < 4; i++) {
-    pinMode(KEY_PINS[i], INPUT_PULLUP);
-  }
-  pinMode(TOGGLE_PIN, INPUT_PULLUP);
-  pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(btnDo, INPUT_PULLUP); pinMode(btnRe, INPUT_PULLUP);
+  pinMode(btnMi, INPUT_PULLUP); pinMode(btnFa, INPUT_PULLUP);
+  pinMode(btnMode, INPUT_PULLUP);
+  Serial.begin(9600);
 }
 
 void loop() {
-  bool currentToggleState = digitalRead(TOGGLE_PIN);
-  if (lastToggleState == HIGH && currentToggleState == LOW) {
-    delay(50);
-    isMinorMode = !isMinorMode;
-    while(digitalRead(TOGGLE_PIN) == LOW);
+  int modeState = digitalRead(btnMode);
+  if (modeState == LOW && lastModeState == HIGH) {
+    minorMode = !minorMode;
+    Serial.println(minorMode ? "Mode: MINOR" : "Mode: MAJOR");
+    delay(200); // debounce
   }
-  lastToggleState = currentToggleState;
+  lastModeState = modeState;
 
-  int pressCount = 0;
-  int lastPressedIndex = -1;
-  for (int i = 0; i < 4; i++) {
-    if (digitalRead(KEY_PINS[i]) == LOW) {
-      pressCount++;
-      lastPressedIndex = i;
-    }
-  }
-  if (pressCount > 1) {
-    tone(BUZZER_PIN, NOTE_SOL);
-  } else if (pressCount == 1) {
-    int activeFreq = isMinorMode ? MINOR_FREQS[lastPressedIndex] : MAJOR_FREQS[lastPressedIndex];
-    tone(BUZZER_PIN, activeFreq);
+  bool doPressed = digitalRead(btnDo) == LOW;
+  bool rePressed = digitalRead(btnRe) == LOW;
+  bool miPressed = digitalRead(btnMi) == LOW;
+  bool faPressed = digitalRead(btnFa) == LOW;
+
+  int pressedCount = doPressed + rePressed + miPressed + faPressed;
+
+  if (pressedCount >= 2) {
+    tone(buzzer, minorMode ? 370 : 392); // Sol, slightly flat for "minor" flavor
+  } else if (doPressed) {
+    tone(buzzer, minorMode ? 247 : 262); // Do
+  } else if (rePressed) {
+    tone(buzzer, minorMode ? 277 : 294); // Re
+  } else if (miPressed) {
+    tone(buzzer, minorMode ? 311 : 330); // Mi
+  } else if (faPressed) {
+    tone(buzzer, 349); // Fa
   } else {
-    noTone(BUZZER_PIN);
+    noTone(buzzer);
   }
 }
